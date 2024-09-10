@@ -1,15 +1,9 @@
-import dayjs from "dayjs";
-import weekOfYear from "dayjs/plugin/weekOfYear";
 import { db } from "../db";
 import { goalCompletions, goals } from "../db/schema";
 import { and, count, eq, gte, lte, sql } from "drizzle-orm";
-
-dayjs.extend(weekOfYear);
+import { firstDayOfWeek, lastDayOfWeek } from "../http/server";
 
 export async function getWeekPendingGoals() {
-  const firstDayOfWeek = dayjs().startOf("week").toDate();
-  const lastDayOfWeek = dayjs().endOf("week").toDate();
-
   const goalsCreatedUpToWeek = db.$with("goals_created_up_to_week").as(
     db
       .select({

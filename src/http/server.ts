@@ -7,8 +7,13 @@ import {
 import { createGoal } from "../functions/create-goal";
 import z from "zod";
 import { getWeekPendingGoals } from "../functions/get-week-pending-goals";
+import dayjs from "dayjs";
+import { createGoalCompletion } from "../functions/create-goal-completion";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
+
+export const firstDayOfWeek = dayjs().startOf("week").toDate();
+export const lastDayOfWeek = dayjs().endOf("week").toDate();
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
@@ -20,6 +25,24 @@ app.get("/pending-goals", async () => {
     pendingGoals,
   };
 });
+
+app.post(
+  "/completions",
+  {
+    schema: {
+      body: z.object({
+        goalId: z.string(),
+      }),
+    },
+  },
+  async (request) => {
+    const { goalId } = request.body;
+
+    await createGoalCompletion({
+      goalId,
+    });
+  }
+);
 
 app.post(
   "/goals",
